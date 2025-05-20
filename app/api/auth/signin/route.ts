@@ -1,14 +1,15 @@
-import { auth, signIn } from "auth"
-import { NextRequest, NextResponse } from "next/server"
+import { signIn } from "auth"
+import { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const callbackUrl = searchParams.get("callbackUrl") || "/"
+  const provider = searchParams.get("provider") || "github"
 
-  console.log(`[auth][signin] GET CallbackUrl: ${callbackUrl}`)
+  console.log(`[auth][signin] GET Provider: ${provider}, CallbackUrl: ${callbackUrl}`)
 
-  // Directly sign in with GitHub provider to avoid redirect loops
-  return signIn("github", { redirectTo: callbackUrl })
+  // Sign in with the specified provider (defaults to GitHub)
+  return signIn(provider, { redirectTo: callbackUrl })
 }
 
 export async function POST(request: NextRequest) {

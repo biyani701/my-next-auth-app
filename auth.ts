@@ -3,7 +3,7 @@ import "next-auth/jwt"
 
 // import Apple from "next-auth/providers/apple"
 // import Atlassian from "next-auth/providers/atlassian"
-// import Auth0 from "next-auth/providers/auth0"
+import Auth0 from "next-auth/providers/auth0"
 // import AzureB2C from "next-auth/providers/azure-ad-b2c"
 // import BankIDNorway from "next-auth/providers/bankid-no"
 // import BoxyHQSAML from "next-auth/providers/boxyhq-saml"
@@ -11,10 +11,10 @@ import "next-auth/jwt"
 // import Coinbase from "next-auth/providers/coinbase"
 // import Discord from "next-auth/providers/discord"
 // import Dropbox from "next-auth/providers/dropbox"
-// import Facebook from "next-auth/providers/facebook"
+import Facebook from "next-auth/providers/facebook"
 import GitHub from "next-auth/providers/github"
 // import GitLab from "next-auth/providers/gitlab"
-// import Google from "next-auth/providers/google"
+import Google from "next-auth/providers/google"
 // import Hubspot from "next-auth/providers/hubspot"
 // import Keycloak from "next-auth/providers/keycloak"
 // import LinkedIn from "next-auth/providers/linkedin"
@@ -85,7 +85,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     // Apple,
     // Atlassian,
-    // Auth0,
+    Auth0({
+      clientId: process.env.AUTH0_CLIENT_ID,
+      clientSecret: process.env.AUTH0_CLIENT_SECRET,
+      issuer: `https://${process.env.AUTH0_ISSUER}`,
+    }),
     // AzureB2C,
     // BankIDNorway,
     // BoxyHQSAML({
@@ -97,10 +101,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // Coinbase,
     // Discord,
     // Dropbox,
-    // Facebook,
+    Facebook,
     GitHub,
     // GitLab,
-    // Google,
+    Google,
     // Hubspot,
     // Keycloak({ name: "Keycloak (bob/bob)" }),
     // LinkedIn,
@@ -152,9 +156,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async redirect({ url, baseUrl }) {
       console.log(`[auth] Redirect - URL: ${url}, BaseUrl: ${baseUrl}`);
 
-      // Allow redirects to the portfolio app
+      // Allow redirects to the portfolio app (development)
       if (url.startsWith('http://localhost:3775')) {
-        console.log(`[auth] Allowing redirect to portfolio app: ${url}`);
+        console.log(`[auth] Allowing redirect to portfolio app (dev): ${url}`);
+        return url;
+      }
+
+      // Allow redirects to the portfolio app (production)
+      if (url.startsWith('https://vishal.biyani.xyz')) {
+        console.log(`[auth] Allowing redirect to portfolio app (prod): ${url}`);
         return url;
       }
 
