@@ -1,7 +1,8 @@
 import { auth } from "auth"
 import { SignIn } from "@/components/auth-components"
-import { Button } from "@/components/ui/button"
+import { ProviderButtons } from "@/components/provider-buttons"
 import Link from "next/link"
+import Image from "next/image"
 
 export default async function SignInPage() {
   const session = await auth()
@@ -10,25 +11,36 @@ export default async function SignInPage() {
     <div className="flex flex-col items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Sign In</h1>
-          <p className="mt-2 text-gray-600">
-            Choose your preferred authentication provider
+          <Image
+            src="/logo.png"
+            alt="Portfolio Logo"
+            width={80}
+            height={80}
+            className="mx-auto mb-4"
+          />
+          <h1 className="text-3xl font-bold mb-2">Portfolio Authentication</h1>
+          <p className="text-gray-600 mb-4">
+            Sign in to access your portfolio dashboard
           </p>
         </div>
 
         <div className="mt-8 space-y-4">
           {session ? (
-            <div className="text-center">
+            <div className="bg-white p-6 rounded-lg shadow-md w-full">
+              <h2 className="text-xl font-semibold mb-4">Welcome back!</h2>
               <p className="mb-4">
-                Signed in as <strong>{session.user?.name}</strong>
+                You are signed in as <strong>{session.user?.name}</strong>
               </p>
-              <SignIn>Go to Home</SignIn>
+              <div className="flex justify-center">
+                <SignIn>Go to Home</SignIn>
+              </div>
             </div>
           ) : (
-            <>
+            <div className="bg-white p-6 rounded-lg shadow-md w-full">
+              <h2 className="text-xl font-semibold mb-4">Choose a sign-in method</h2>
               <div className="grid gap-3">
                 <SignIn provider="github">
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center justify-center py-3">
                     <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
                       <path
                         fill="currentColor"
@@ -40,7 +52,7 @@ export default async function SignInPage() {
                 </SignIn>
 
                 <SignIn provider="google">
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center justify-center py-3">
                     <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
                       <path
                         fill="currentColor"
@@ -52,7 +64,7 @@ export default async function SignInPage() {
                 </SignIn>
 
                 <SignIn provider="facebook">
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center justify-center py-3">
                     <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
                       <path
                         fill="currentColor"
@@ -64,7 +76,7 @@ export default async function SignInPage() {
                 </SignIn>
 
                 <SignIn provider="auth0">
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center justify-center py-3">
                     <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
                       <path
                         fill="currentColor"
@@ -76,12 +88,12 @@ export default async function SignInPage() {
                 </SignIn>
               </div>
 
-              <div className="text-center mt-4">
+              <div className="text-center mt-6">
                 <Link href="/" className="text-sm text-blue-600 hover:underline">
                   Back to Home
                 </Link>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

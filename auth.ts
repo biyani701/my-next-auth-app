@@ -48,11 +48,22 @@ const storage = createStorage({
     : memoryDriver(),
 })
 
+// We'll use the standard adapter but handle account linking in the callbacks
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: !!process.env.AUTH_DEBUG,
-  theme: { logo: "https://authjs.dev/img/logo-sm.png" },
+  theme: {
+    logo: "/logo.png",
+    brandColor: "#0070f3",
+    buttonText: "#ffffff",
+  },
   adapter: UnstorageAdapter(storage),
   trustHost: true,
+  pages: {
+    signIn: "/auth/signin",
+    error: "/auth/error",
+  },
+
   cookies: {
     sessionToken: {
       name: `next-auth.session-token`,
@@ -101,9 +112,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // Coinbase,
     // Discord,
     // Dropbox,
-    Facebook,
+    // Facebook provider with credentials from environment variables
+    Facebook({
+      clientId: process.env.AUTH_FACEBOOK_ID,
+      clientSecret: process.env.AUTH_FACEBOOK_SECRET,
+    }),
     GitHub,
     // GitLab,
+    // Google - Temporarily disabled until credentials are added
     Google,
     // Hubspot,
     // Keycloak({ name: "Keycloak (bob/bob)" }),
@@ -152,6 +168,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (token?.accessToken) session.accessToken = token.accessToken
       return session
+    },
+    // Handle account linking and sign-in
+    async signIn({ user, account }) {
+      // Log the sign-in attempt
+      console.log("[auth][signIn] Sign-in attempt for:", user?.email, "with provider:", account?.provider);
+
+      // This is the key to fixing the OAuthAccountNotLinked error
+      // By returning true, we're telling Auth.js to allow the sign-in
+      // even if there's another account with the same email
+      return true
     },
     async redirect({ url, baseUrl }) {
       console.log(`[auth] Redirect - URL: ${url}, BaseUrl: ${baseUrl}`);

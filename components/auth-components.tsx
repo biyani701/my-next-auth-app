@@ -3,8 +3,9 @@ import { Button } from "./ui/button"
 
 export function SignIn({
   provider,
+  children,
   ...props
-}: { provider?: string } & React.ComponentPropsWithRef<typeof Button>) {
+}: { provider?: string, children?: React.ReactNode } & React.ComponentPropsWithRef<typeof Button>) {
   return (
     <form
       action={async () => {
@@ -12,7 +13,9 @@ export function SignIn({
         await signIn(provider)
       }}
     >
-      <Button {...props}>Sign In</Button>
+      <Button {...props}>
+        {children || "Sign In"}
+      </Button>
     </form>
   )
 }
