@@ -6,7 +6,7 @@
 # Error details
 
 ```
-Error: locator.click: Test timeout of 30000ms exceeded.
+Error: locator.click: Test timeout of 60000ms exceeded.
 Call log:
   - waiting for getByRole('link', { name: /sign in/i })
 
@@ -109,7 +109,7 @@ Call log:
   27 |     
   28 |     // Click the sign in link
 > 29 |     await page.getByRole('link', { name: /sign in/i }).click();
-     |                                                        ^ Error: locator.click: Test timeout of 30000ms exceeded.
+     |                                                        ^ Error: locator.click: Test timeout of 60000ms exceeded.
   30 |     
   31 |     // Check if we're redirected to the sign-in page
   32 |     await expect(page).toHaveURL(/.*\/api\/auth\/signin.*/);

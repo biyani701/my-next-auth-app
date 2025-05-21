@@ -6,7 +6,7 @@
 # Error details
 
 ```
-Error: locator.click: Test timeout of 30000ms exceeded.
+Error: locator.click: Test timeout of 60000ms exceeded.
 Call log:
   - waiting for getByRole('link', { name: /sign in/i })
 
@@ -131,7 +131,7 @@ Call log:
   49 |     // First sign in
   50 |     await page.goto('/');
 > 51 |     await page.getByRole('link', { name: /sign in/i }).click();
-     |                                                        ^ Error: locator.click: Test timeout of 30000ms exceeded.
+     |                                                        ^ Error: locator.click: Test timeout of 60000ms exceeded.
   52 |     await page.getByLabel('Email').fill('test@example.com');
   53 |     await page.getByLabel('Password').fill('password');
   54 |     await page.getByRole('button', { name: /sign in with credentials/i }).click();

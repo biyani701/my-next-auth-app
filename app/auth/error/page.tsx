@@ -3,8 +3,9 @@
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
+import { Suspense } from "react"
 
-export default function ErrorPage() {
+function ErrorContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get("error")
 
@@ -89,14 +90,14 @@ export default function ErrorPage() {
               Please try signing in with a different provider or go back to the sign-in page.
             </p>
             <div className="flex flex-col gap-4 mt-6">
-              <Link 
-                href="/auth/signin" 
+              <Link
+                href="/auth/signin"
                 className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Back to Sign In
               </Link>
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Go to Home
@@ -106,5 +107,13 @@ export default function ErrorPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ErrorPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <ErrorContent />
+    </Suspense>
   )
 }

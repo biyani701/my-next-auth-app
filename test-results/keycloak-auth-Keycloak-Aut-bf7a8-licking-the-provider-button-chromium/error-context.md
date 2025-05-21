@@ -41,7 +41,7 @@ waiting for navigation until "load"
   - paragraph:
     - text: New to GitHub?
     - link "Create an account":
-      - /url: /join?return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3DOv23liMhMP1kGBGvjldY%26code_challenge%3DdwzvstHdgoZpyMn9KnqGMLuogpUwdQCrnEEdXFUMUQU%26code_challenge_method%3DS256%26redirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fapi%252Fauth%252Fcallback%252Fgithub%26response_type%3Dcode%26scope%3Dread%253Auser%2Buser%253Aemail&source=oauth
+      - /url: /join?return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3DOv23liMhMP1kGBGvjldY%26code_challenge%3D2rBfN61_QzvsJhe9Qw9gVjaQgH9mM9iqV2ertlDYdTg%26code_challenge_method%3DS256%26redirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fapi%252Fauth%252Fcallback%252Fgithub%26response_type%3Dcode%26scope%3Dread%253Auser%2Buser%253Aemail&source=oauth
 - contentinfo:
   - list:
     - listitem:

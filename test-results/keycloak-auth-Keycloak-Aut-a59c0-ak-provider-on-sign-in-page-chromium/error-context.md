@@ -6,13 +6,13 @@
 # Error details
 
 ```
-Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
 
 Locator: getByRole('button', { name: /Keycloak/i })
 Expected: visible
 Received: <element(s) not found>
 Call log:
-  - expect.toBeVisible with timeout 5000ms
+  - expect.toBeVisible with timeout 10000ms
   - waiting for getByRole('button', { name: /Keycloak/i })
 
     at C:\vishal\git-repo\next-auth-example\tests\keycloak-auth.spec.js:20:34
@@ -46,7 +46,7 @@ Call log:
   - paragraph:
     - text: New to GitHub?
     - link "Create an account":
-      - /url: /join?return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3DOv23liMhMP1kGBGvjldY%26code_challenge%3Davuu7N5hLODXck7NEo6qiYTkVopju7d5tmLyQ05Dg-0%26code_challenge_method%3DS256%26redirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fapi%252Fauth%252Fcallback%252Fgithub%26response_type%3Dcode%26scope%3Dread%253Auser%2Buser%253Aemail&source=oauth
+      - /url: /join?return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3DOv23liMhMP1kGBGvjldY%26code_challenge%3DL6LKCrPhP3KJOzbAdTyOZ0YmeRgtOZKul9HUINQnOr8%26code_challenge_method%3DS256%26redirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fapi%252Fauth%252Fcallback%252Fgithub%26response_type%3Dcode%26scope%3Dread%253Auser%2Buser%253Aemail&source=oauth
 - contentinfo:
   - list:
     - listitem:
@@ -90,7 +90,7 @@ Call log:
   18 |     // Check that the Keycloak provider button is visible
   19 |     const keycloakButton = page.getByRole('button', { name: /Keycloak/i });
 > 20 |     await expect(keycloakButton).toBeVisible();
-     |                                  ^ Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+     |                                  ^ Error: Timed out 10000ms waiting for expect(locator).toBeVisible()
   21 |   });
   22 |
   23 |   test('should redirect to Keycloak login page when clicking the provider button', async ({ page }) => {
