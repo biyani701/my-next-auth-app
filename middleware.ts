@@ -32,8 +32,13 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
-  // For non-API routes, just pass through
-  return NextResponse.next()
+  // For non-API routes, add the pathname to the headers
+  const response = NextResponse.next()
+
+  // Add the pathname to the headers for use in components
+  response.headers.set('x-pathname', request.nextUrl.pathname)
+
+  return response
 }
 
 // Read more: https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher

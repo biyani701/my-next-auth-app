@@ -6,6 +6,7 @@ import "next-auth/jwt"
 import Auth0 from "next-auth/providers/auth0"
 // import AzureB2C from "next-auth/providers/azure-ad-b2c"
 // import BankIDNorway from "next-auth/providers/bankid-no"
+import Credentials from "next-auth/providers/credentials"
 // import BoxyHQSAML from "next-auth/providers/boxyhq-saml"
 // import Cognito from "next-auth/providers/cognito"
 // import Coinbase from "next-auth/providers/coinbase"
@@ -16,7 +17,7 @@ import GitHub from "next-auth/providers/github"
 // import GitLab from "next-auth/providers/gitlab"
 import Google from "next-auth/providers/google"
 // import Hubspot from "next-auth/providers/hubspot"
-// import Keycloak from "next-auth/providers/keycloak"
+import Keycloak from "next-auth/providers/keycloak"
 // import LinkedIn from "next-auth/providers/linkedin"
 // import MicrosoftEntraId from "next-auth/providers/microsoft-entra-id"
 // import Netlify from "next-auth/providers/netlify"
@@ -64,6 +65,47 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: "/auth/error",
   },
 
+  // We'll use the standard providers list
+  providers: [
+    Auth0({
+      clientId: process.env.AUTH0_CLIENT_ID,
+      clientSecret: process.env.AUTH0_CLIENT_SECRET,
+      issuer: `https://${process.env.AUTH0_ISSUER}`,
+    }),
+    Facebook({
+      clientId: process.env.AUTH_FACEBOOK_ID,
+      clientSecret: process.env.AUTH_FACEBOOK_SECRET,
+    }),
+    GitHub,
+    Google,
+    Keycloak({
+      clientId: process.env.AUTH_KEYCLOAK_ID,
+      clientSecret: process.env.AUTH_KEYCLOAK_SECRET,
+      issuer: process.env.AUTH_KEYCLOAK_ISSUER,
+      name: "Keycloak"
+    }),
+    // Add test credentials provider for testing
+    Credentials({
+      id: "test-credentials",
+      name: "Test Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        // This is a test provider, so we'll accept any credentials
+        if (credentials?.email && credentials?.password) {
+          return {
+            id: "1",
+            name: "Test User",
+            email: credentials.email as string,
+          };
+        }
+        return null;
+      }
+    }),
+  ],
+
   cookies: {
     sessionToken: {
       name: `next-auth.session-token`,
@@ -93,63 +135,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
     }
   },
-  providers: [
-    // Apple,
-    // Atlassian,
-    Auth0({
-      clientId: process.env.AUTH0_CLIENT_ID,
-      clientSecret: process.env.AUTH0_CLIENT_SECRET,
-      issuer: `https://${process.env.AUTH0_ISSUER}`,
-    }),
-    // AzureB2C,
-    // BankIDNorway,
-    // BoxyHQSAML({
-    //   clientId: "dummy",
-    //   clientSecret: "dummy",
-    //   issuer: process.env.AUTH_BOXYHQ_SAML_ISSUER,
-    // }),
-    // Cognito,
-    // Coinbase,
-    // Discord,
-    // Dropbox,
-    // Facebook provider with credentials from environment variables
-    Facebook({
-      clientId: process.env.AUTH_FACEBOOK_ID,
-      clientSecret: process.env.AUTH_FACEBOOK_SECRET,
-    }),
-    GitHub,
-    // GitLab,
-    // Google - Temporarily disabled until credentials are added
-    Google,
-    // Hubspot,
-    // Keycloak({ name: "Keycloak (bob/bob)" }),
-    // LinkedIn,
-    // MicrosoftEntraId,
-    // Netlify,
-    // Okta,
-    // Passkey({
-    //   formFields: {
-    //     email: {
-    //       label: "Username",
-    //       required: true,
-    //       autocomplete: "username webauthn",
-    //     },
-    //   },
-    // }),
-    // Passage,
-    // Pinterest,
-    // Reddit,
-    // Salesforce,
-    // Slack,
-    // Spotify,
-    // Twitch,
-    // Twitter,
-    // Vipps({
-    //   issuer: "https://apitest.vipps.no/access-management-1.0/access/",
-    // }),
-    // WorkOS({ connection: process.env.AUTH_WORKOS_CONNECTION! }),
-    // Zoom,
-  ],
   basePath: "/api/auth",
   session: { strategy: "jwt" },
   callbacks: {

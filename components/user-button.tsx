@@ -9,10 +9,21 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import { SignIn, SignOut } from "./auth-components"
+import { headers } from "next/headers"
 
 export default async function UserButton() {
   const session = await auth()
-  if (!session?.user) return <SignIn />
+  const headersList = headers()
+  const pathname = headersList.get("x-pathname") || ""
+
+  // Hide sign-in button on the sign-in page
+  if (!session?.user) {
+    // Don't show sign-in button on the sign-in page
+    if (pathname === "/auth/signin") {
+      return null
+    }
+    return <SignIn />
+  }
   return (
     <div className="flex items-center gap-2">
       <span className="hidden text-sm sm:inline-flex">
