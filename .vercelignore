@@ -1,0 +1,15 @@
+# Ignore everything except what's needed for the build
+README.md
+.git
+.github
+.gitignore
+.env.example
+.env.local.example
+test-docker.sh
+playwright-report
+test-results
+tests
+
+# Don't ignore these files
+!prisma/schema.prisma
+!scripts/prisma-generate.js

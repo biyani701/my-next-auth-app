@@ -8,11 +8,11 @@
   "homepage": "https://next-auth-example.vercel.app",
   "scripts": {
     "dev": "next",
-    "build": "node vercel-build.js",
+    "build": "prisma generate && next build",
     "start": "next start",
     "clean": "rimraf .next",
-    "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && next build"
+    "postinstall": "node scripts/prisma-generate.js",
+    "vercel-build": "node scripts/prisma-generate.js && next build"
   },
   "author": "Iain Collins <me@iaincollins.com>",
   "contributors": [

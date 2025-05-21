@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import "next-auth/jwt"
 import { PrismaAdapter } from "@auth/prisma-adapter"
+import { PrismaClient } from "@prisma/client"
 
 // import Apple from "next-auth/providers/apple"
 // import Atlassian from "next-auth/providers/atlassian"
@@ -40,8 +41,8 @@ import memoryDriver from "unstorage/drivers/memory"
 import vercelKVDriver from "unstorage/drivers/vercel-kv"
 import { UnstorageAdapter } from "@auth/unstorage-adapter"
 
-// Import the Prisma client from our lib
-import prisma from './lib/prisma'
+// Create a new PrismaClient instance for Auth.js
+const prisma = new PrismaClient()
 
 // Configure storage for fallback
 const storage = createStorage({
