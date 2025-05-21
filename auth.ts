@@ -1,7 +1,5 @@
 import NextAuth from "next-auth"
 import "next-auth/jwt"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
 
 // import Apple from "next-auth/providers/apple"
 // import Atlassian from "next-auth/providers/atlassian"
@@ -41,10 +39,7 @@ import memoryDriver from "unstorage/drivers/memory"
 import vercelKVDriver from "unstorage/drivers/vercel-kv"
 import { UnstorageAdapter } from "@auth/unstorage-adapter"
 
-// Create a new PrismaClient instance for Auth.js
-const prisma = new PrismaClient()
-
-// Configure storage for fallback
+// Configure storage for Auth.js
 const storage = createStorage({
   driver: (() => {
     // Check if we're on Vercel and have the required KV configuration
@@ -57,7 +52,7 @@ const storage = createStorage({
       });
     } else {
       // Fall back to memory driver if not on Vercel or missing KV config
-      console.log('[auth] Using memory storage (no Vercel KV configuration found)');
+      console.log('[auth] Using memory storage (no database configuration found)');
       return memoryDriver();
     }
   })(),
@@ -88,7 +83,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     brandColor: "#0070f3",
     buttonText: "#ffffff",
   },
-  adapter: process.env.DATABASE_URL ? PrismaAdapter(prisma) : UnstorageAdapter(storage),
+  adapter: UnstorageAdapter(storage),
   trustHost: true,
   // Set the URL for callbacks
   pages: {
