@@ -1,13 +1,102 @@
-import CustomLink from "@/components/custom-link"
-import { auth } from "auth"
-import { SignIn } from "@/components/auth-components"
 import Image from "next/image"
+import { auth } from "auth"
+import CustomLink from "@/components/custom-link"
+import { SignIn } from "@/components/auth-components"
+
+// Define provider types
+type ProviderID = 'github' | 'google' | 'facebook' | 'auth0' | 'keycloak' | 'credentials';
+
+// Authentication provider icons and colors
+const providerIcons: Record<ProviderID, JSX.Element> = {
+  github: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6 mr-3">
+      <path
+        fill="#24292E"
+        d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+      />
+    </svg>
+  ),
+  google: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6 mr-3">
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+      />
+    </svg>
+  ),
+  facebook: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6 mr-3">
+      <path
+        fill="#1877F2"
+        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+      />
+    </svg>
+  ),
+  auth0: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6 mr-3">
+      <path
+        fill="#EB5424"
+        d="M21.98 7.448L19.62 0H4.347L2.02 7.448c-1.352 4.312.03 9.206 3.815 12.015L12.007 24l6.157-4.552c3.755-2.81 5.182-7.688 3.815-12.015l-6.16 4.58 2.343 7.45-6.157-4.597-6.158 4.58 2.358-7.433-6.188-4.55 7.63-.045L12.008 0l2.356 7.404 7.615.044z"
+      />
+    </svg>
+  ),
+  keycloak: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6 mr-3">
+      <path
+        fill="#4B5320"
+        d="M12 0L1.354 6v12L12 24l10.646-6V6L12 0zm7.925 16.515l-7.925 4.475-7.925-4.475V7.485L12 3.01l7.925 4.475v9.03z"
+      />
+      <path
+        fill="#4B5320"
+        d="M12 6.277L7.099 9.144v5.712L12 17.723l4.901-2.867V9.144L12 6.277zm3.921 7.633L12 16.337l-3.921-2.427V9.99L12 7.663l3.921 2.427v4.02z"
+      />
+    </svg>
+  ),
+  credentials: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6 mr-3">
+      <circle cx="12" cy="12" r="10" fill="#805AD5" />
+      <rect x="9" y="8" width="6" height="3" rx="1" fill="white" />
+      <path 
+        fill="white"
+        d="M16 11H8a1 1 0 00-1 1v4a1 1 0 001 1h8a1 1 0 001-1v-4a1 1 0 00-1-1zm-2 3a1 1 0 11-2 0 1 1 0 012 0zm-3 0a1 1 0 11-2 0 1 1 0 012 0z"
+      />
+    </svg>
+  ),
+}
+
+// Auth provider configuration
+interface Provider {
+  id: ProviderID;
+  label: string;
+}
+
+const providers: Provider[] = [
+  { id: "github", label: "Continue with GitHub" },
+  { id: "google", label: "Continue with Google" },
+  { id: "facebook", label: "Continue with Facebook" },
+  { id: "auth0", label: "Continue with Auth0" },
+  { id: "keycloak", label: "Continue with Keycloak" },
+  { id: "credentials", label: "Continue with Credentials" },
+]
 
 export default async function Index() {
   const session = await auth()
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 py-8">
+      {/* Header */}
       <div className="text-center">
         <Image
           src="/logo.png"
@@ -22,97 +111,43 @@ export default async function Index() {
         </p>
       </div>
 
-      {session ? (
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-          <h2 className="text-xl font-semibold mb-4">Welcome back!</h2>
-          <p className="mb-4">
-            You are signed in as <strong>{session.user?.name}</strong>
-          </p>
-          <div className="flex flex-col gap-4">
-            <CustomLink href="/server-example" className="text-blue-600 hover:underline">
-              View Server Example
-            </CustomLink>
-            <CustomLink href="/client-example" className="text-blue-600 hover:underline">
-              View Client Example
-            </CustomLink>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-          <h2 className="text-xl font-semibold mb-4">Choose a sign-in method</h2>
-          <div className="grid gap-3">
-            <SignIn provider="github">
-              <div className="flex items-center justify-center py-3">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
-                  <path
-                    fill="currentColor"
-                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-                  />
-                </svg>
-                Continue with GitHub
-              </div>
-            </SignIn>
+      {/* Auth Container */}
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+        {session ? (
+          // Logged in state
+          <>
+            <h2 className="text-xl font-semibold mb-4">Welcome back!</h2>
+            <p className="mb-4">
+              You are signed in as <strong>{session.user?.name}</strong>
+            </p>
+            <div className="flex flex-col gap-4">
+              <CustomLink href="/server-example" className="text-blue-600 hover:underline">
+                View Server Example
+              </CustomLink>
+              <CustomLink href="/client-example" className="text-blue-600 hover:underline">
+                View Client Example
+              </CustomLink>
+            </div>
+          </>
+        ) : (
+          // Login options
+          <>
+            <h2 className="text-xl font-semibold mb-4">Choose a sign-in method</h2>
+            <div className="grid gap-3">
+              {providers.map((provider) => (
+                <SignIn key={provider.id} provider={provider.id}>
+                  <div className="flex items-center justify-center py-3">
+                    {providerIcons[provider.id]}
+                    {provider.label}
+                  </div>
+                </SignIn>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
 
-            <SignIn provider="google">
-              <div className="flex items-center justify-center py-3">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
-                  <path
-                    fill="currentColor"
-                    d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                  />
-                </svg>
-                Continue with Google
-              </div>
-            </SignIn>
-
-            <SignIn provider="facebook">
-              <div className="flex items-center justify-center py-3">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
-                  <path
-                    fill="currentColor"
-                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
-                  />
-                </svg>
-                Continue with Facebook
-              </div>
-            </SignIn>
-
-            <SignIn provider="auth0">
-              <div className="flex items-center justify-center py-3">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
-                  <path
-                    fill="currentColor"
-                    d="M21.98 7.448L19.62 0H4.347L2.02 7.448c-1.352 4.312.03 9.206 3.815 12.015L12.007 24l6.157-4.552c3.755-2.81 5.182-7.688 3.815-12.015l-6.16 4.58 2.343 7.45-6.157-4.597-6.158 4.58 2.358-7.433-6.188-4.55 7.63-.045L12.008 0l2.356 7.404 7.615.044z"
-                  />
-                </svg>
-                Continue with Auth0
-              </div>
-            </SignIn>
-            <SignIn provider="keycloak">
-              <div className="flex items-center justify-center py-3">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
-                  <path
-                    fill="currentColor"
-                    d="M21.98 7.448L19.62 0H4.347L2.02 7.448c-1.352 4.312.03 9.206 3.815 12.015L12.007 24l6.157-4.552c3.755-2.81 5.182-7.688 3.815-12.015l-6.16 4.58 2.343 7.45-6.157-4.597-6.158 4.58 2.358-7.433-6.188-4.55 7.63-.045L12.008 0l2.356 7.404 7.615.044z"
-                  />
-                </svg>
-                Continue with Keycloak
-              </div>
-            </SignIn>
-            <SignIn provider="credentials">
-              <div className="flex items-center justify-center py-3">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
-                  <path
-                    fill="currentColor"
-                    d="M21.98 7.448L19.62 0H4.347L2.02 7.448c-1.352 4.312.03 9.206 3.815 12.015L12.007 24l6.157-4.552c3.755-2.81 5.182-7.688 3.815-12.015l-6.16 4.58 2.343 7.45-6.157-4.597-6.158 4.58 2.358-7.433-6.188-4.55 7.63-.045L12.008 0l2.356 7.404 7.615.044z"
-                  />
-                </svg>
-                Continue with Credentials
-              </div>
-            </SignIn>
-          </div>
-        </div>
-      )}
+      {/* Session Debug Panel */}
       {session && (
         <div className="flex flex-col rounded-md bg-gray-100 w-full max-w-md mt-4">
           <div className="rounded-t-md bg-gray-200 p-4 font-bold">
