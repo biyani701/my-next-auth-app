@@ -1,5 +1,6 @@
 import NextAuth from "next-auth"
 import "next-auth/jwt"
+import { PrismaAdapter } from "@auth/prisma-adapter"
 
 // import Apple from "next-auth/providers/apple"
 // import Atlassian from "next-auth/providers/atlassian"
@@ -39,7 +40,10 @@ import memoryDriver from "unstorage/drivers/memory"
 import vercelKVDriver from "unstorage/drivers/vercel-kv"
 import { UnstorageAdapter } from "@auth/unstorage-adapter"
 
-// Configure storage based on environment and available configuration
+// Import the Prisma client from our lib
+import prisma from './lib/prisma'
+
+// Configure storage for fallback
 const storage = createStorage({
   driver: (() => {
     // Check if we're on Vercel and have the required KV configuration
@@ -60,6 +64,22 @@ const storage = createStorage({
 
 // We'll use the standard adapter but handle account linking in the callbacks
 
+// Determine the base URL based on the environment
+const getBaseUrl = () => {
+  // If AUTH_URL is provided, use it
+  if (process.env.AUTH_URL) {
+    return process.env.AUTH_URL;
+  }
+
+  // In development, use localhost
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3000';
+  }
+
+  // In production, use the Vercel URL
+  return 'https://my-next-auth-app-ten.vercel.app';
+};
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: !!process.env.AUTH_DEBUG,
   theme: {
@@ -67,8 +87,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     brandColor: "#0070f3",
     buttonText: "#ffffff",
   },
-  adapter: UnstorageAdapter(storage),
+  adapter: process.env.DATABASE_URL ? PrismaAdapter(prisma) : UnstorageAdapter(storage),
   trustHost: true,
+  // Set the URL for callbacks
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
@@ -85,8 +106,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId: process.env.AUTH_FACEBOOK_ID,
       clientSecret: process.env.AUTH_FACEBOOK_SECRET,
     }),
-    GitHub,
-    Google,
+    GitHub({
+      clientId: process.env.AUTH_GITHUB_ID,
+      clientSecret: process.env.AUTH_GITHUB_SECRET,
+    }),
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+    }),
     Keycloak({
       clientId: process.env.AUTH_KEYCLOAK_ID,
       clientSecret: process.env.AUTH_KEYCLOAK_SECRET,
@@ -120,30 +147,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
         path: '/',
-        secure: true,
-        domain: process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
+        secure: process.env.NODE_ENV !== 'development',
+        domain: process.env.NODE_ENV === 'development' ? undefined :
+                process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
       }
     },
     callbackUrl: {
       name: `next-auth.callback-url`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
         path: '/',
-        secure: true,
-        domain: process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
+        secure: process.env.NODE_ENV !== 'development',
+        domain: process.env.NODE_ENV === 'development' ? undefined :
+                process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
       }
     },
     csrfToken: {
       name: `next-auth.csrf-token`,
       options: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
         path: '/',
-        secure: true,
-        domain: process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
+        secure: process.env.NODE_ENV !== 'development',
+        domain: process.env.NODE_ENV === 'development' ? undefined :
+                process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
       }
     }
   },
@@ -178,8 +208,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Always return true to allow sign-in
       return true;
     },
-    async redirect({ url, baseUrl }) {
-      console.log(`[auth] Redirect - URL: ${url}, BaseUrl: ${baseUrl}`);
+    async redirect({ url }) {
+      // Use our dynamic base URL
+      const dynamicBaseUrl = getBaseUrl();
+      console.log(`[auth] Redirect - URL: ${url}, BaseUrl: ${dynamicBaseUrl}`);
 
       // Allow redirects to the portfolio app (development)
       if (url.startsWith('http://localhost:3775')) {
@@ -206,16 +238,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       }
 
-      // If the URL is relative, prepend the base URL
+      // If the URL is relative, prepend the dynamic base URL
       if (url.startsWith('/')) {
-        console.log(`[auth] Relative URL, prepending base URL: ${baseUrl}${url}`);
-        return `${baseUrl}${url}`;
+        console.log(`[auth] Relative URL, prepending base URL: ${dynamicBaseUrl}${url}`);
+        return `${dynamicBaseUrl}${url}`;
       }
 
       // If the URL is absolute but on the same origin as the site, allow it
       try {
         const urlOrigin = new URL(url).origin;
-        if (urlOrigin === baseUrl) {
+        if (urlOrigin === dynamicBaseUrl) {
           console.log(`[auth] Same origin URL, allowing: ${url}`);
           return url;
         }
@@ -229,9 +261,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         console.error(`[auth] Error parsing URL: ${error}`);
       }
 
-      // Otherwise, redirect to the base URL
-      console.log(`[auth] Defaulting to base URL: ${baseUrl}`);
-      return baseUrl;
+      // Otherwise, redirect to the dynamic base URL
+      console.log(`[auth] Defaulting to base URL: ${dynamicBaseUrl}`);
+      return dynamicBaseUrl;
     },
   },
   experimental: { enableWebAuthn: true },

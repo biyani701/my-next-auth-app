@@ -1,6 +1,9 @@
 import { signIn } from "auth"
 import { NextRequest } from "next/server"
 
+// Use Node.js runtime for Prisma compatibility
+export const runtime = "nodejs"
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const callbackUrl = searchParams.get("callbackUrl") || "/"
