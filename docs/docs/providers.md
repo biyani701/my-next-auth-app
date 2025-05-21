@@ -11,26 +11,26 @@ Auth.js supports multiple authentication providers to give your users flexibilit
 <div className="row">
   <div className="col col--4">
     <div className="card provider-card">
-      <img src="/img/providers/github.svg" alt="GitHub Logo" />
+      <img src="/docs/img/providers/github.svg" alt="GitHub Logo" />
       <h3>GitHub</h3>
       <p>Sign in with your GitHub account</p>
-      <a href="/providers/github" className="button button--primary">Learn More</a>
+      <a href="/docs/providers/github" className="button button--primary">Learn More</a>
     </div>
   </div>
   <div className="col col--4">
     <div className="card provider-card">
-      <img src="/img/providers/google.svg" alt="Google Logo" />
+      <img src="/docs/img/providers/google.svg" alt="Google Logo" />
       <h3>Google</h3>
       <p>Sign in with your Google account</p>
-      <a href="/providers/google" className="button button--primary">Learn More</a>
+      <a href="/docs/providers/google" className="button button--primary">Learn More</a>
     </div>
   </div>
   <div className="col col--4">
     <div className="card provider-card">
-      <img src="/img/providers/auth0.svg" alt="Auth0 Logo" />
+      <img src="/docs/img/providers/auth0.svg" alt="Auth0 Logo" />
       <h3>Auth0</h3>
       <p>Sign in with your Auth0 account</p>
-      <a href="/providers/auth0" className="button button--primary">Learn More</a>
+      <a href="/docs/providers/auth0" className="button button--primary">Learn More</a>
     </div>
   </div>
 </div>
@@ -38,26 +38,26 @@ Auth.js supports multiple authentication providers to give your users flexibilit
 <div className="row" style={{marginTop: '20px'}}>
   <div className="col col--4">
     <div className="card provider-card">
-      <img src="/img/providers/facebook.svg" alt="Facebook Logo" />
+      <img src="/docs/img/providers/facebook.svg" alt="Facebook Logo" />
       <h3>Facebook</h3>
       <p>Sign in with your Facebook account</p>
-      <a href="/providers/facebook" className="button button--primary">Learn More</a>
+      <a href="/docs/providers/facebook" className="button button--primary">Learn More</a>
     </div>
   </div>
   <div className="col col--4">
     <div className="card provider-card">
-      <img src="/img/providers/keycloak.svg" alt="Keycloak Logo" />
+      <img src="/docs/img/providers/keycloak.svg" alt="Keycloak Logo" />
       <h3>Keycloak</h3>
       <p>Sign in with your Keycloak account</p>
-      <a href="/providers/keycloak" className="button button--primary">Learn More</a>
+      <a href="/docs/providers/keycloak" className="button button--primary">Learn More</a>
     </div>
   </div>
   <div className="col col--4">
     <div className="card provider-card">
-      <img src="/img/providers/credentials.svg" alt="Credentials Logo" />
+      <img src="/docs/img/providers/credentials.svg" alt="Credentials Logo" />
       <h3>Credentials</h3>
       <p>Sign in with email and password</p>
-      <a href="/providers/credentials" className="button button--primary">Learn More</a>
+      <a href="/docs/providers/credentials" className="button button--primary">Learn More</a>
     </div>
   </div>
 </div>

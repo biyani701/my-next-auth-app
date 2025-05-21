@@ -13,7 +13,7 @@ import { headers } from "next/headers"
 
 export default async function UserButton() {
   const session = await auth()
-  const headersList = headers()
+  const headersList = await headers()
   const pathname = headersList.get("x-pathname") || ""
 
   // Hide sign-in button on the sign-in page
