@@ -123,6 +123,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'none',
         path: '/',
         secure: true,
+        domain: process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
       }
     },
     callbackUrl: {
@@ -132,6 +133,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'none',
         path: '/',
         secure: true,
+        domain: process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
       }
     },
     csrfToken: {
@@ -141,6 +143,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'none',
         path: '/',
         secure: true,
+        domain: process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
       }
     }
   },

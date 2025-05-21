@@ -8,8 +8,8 @@ module.exports = {
         source: '/:path*',
         headers: [
           {
-            key: 'Access-Control-Allow-Origin',
-            value: 'http://localhost:3775', // Restrict to your client domain
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
           },
           {
             key: 'Access-Control-Allow-Methods',
@@ -19,10 +19,8 @@ module.exports = {
             key: 'Access-Control-Allow-Headers',
             value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
           },
-          {
-            key: 'Access-Control-Allow-Credentials',
-            value: 'true',
-          },
+          // We'll use the middleware to set the Access-Control-Allow-Origin header dynamically
+          // This ensures we can handle multiple origins correctly
         ],
       },
     ];
