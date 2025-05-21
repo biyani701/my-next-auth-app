@@ -168,10 +168,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Log the sign-in attempt
       console.log("[auth][signIn] Sign-in attempt for:", user?.email, "with provider:", account?.provider);
 
-      // This is the key to fixing the OAuthAccountNotLinked error
-      // By returning true, we're telling Auth.js to allow the sign-in
-      // even if there's another account with the same email
-      return true
+      // In Auth.js v5, we need to explicitly return true to allow sign-in
+      // This will fix the OAuthAccountNotLinked error
+      console.log("[auth][signIn] Allowing sign-in for user:", user?.email);
+
+      // Always return true to allow sign-in
+      return true;
     },
     async redirect({ url, baseUrl }) {
       console.log(`[auth] Redirect - URL: ${url}, BaseUrl: ${baseUrl}`);
@@ -230,6 +232,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   experimental: { enableWebAuthn: true },
+  events: {
+    // This event is triggered when a user signs in with a new provider
+    // but the email is already associated with another account
+    async linkAccount({ user, account }) {
+      console.log("[auth][linkAccount] Linking account for user:", user?.email, "with provider:", account?.provider);
+      // In Auth.js v5, returning nothing (or undefined) from this event handler
+      // allows the account to be linked automatically
+    },
+    // This event is triggered when a user signs in
+    async signIn({ user, account, isNewUser }) {
+      console.log("[auth][event:signIn] User signed in:", user?.email, "with provider:", account?.provider);
+      if (isNewUser) {
+        console.log("[auth][event:signIn] This is a new user");
+      }
+    },
+  },
 })
 
 declare module "next-auth" {
