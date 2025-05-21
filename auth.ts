@@ -39,14 +39,23 @@ import memoryDriver from "unstorage/drivers/memory"
 import vercelKVDriver from "unstorage/drivers/vercel-kv"
 import { UnstorageAdapter } from "@auth/unstorage-adapter"
 
+// Configure storage based on environment and available configuration
 const storage = createStorage({
-  driver: process.env.VERCEL
-    ? vercelKVDriver({
+  driver: (() => {
+    // Check if we're on Vercel and have the required KV configuration
+    if (process.env.VERCEL && process.env.AUTH_KV_REST_API_URL && process.env.AUTH_KV_REST_API_TOKEN) {
+      console.log('[auth] Using Vercel KV storage');
+      return vercelKVDriver({
         url: process.env.AUTH_KV_REST_API_URL,
         token: process.env.AUTH_KV_REST_API_TOKEN,
         env: false,
-      })
-    : memoryDriver(),
+      });
+    } else {
+      // Fall back to memory driver if not on Vercel or missing KV config
+      console.log('[auth] Using memory storage (no Vercel KV configuration found)');
+      return memoryDriver();
+    }
+  })(),
 })
 
 // We'll use the standard adapter but handle account linking in the callbacks
