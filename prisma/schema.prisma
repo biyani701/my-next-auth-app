@@ -3,6 +3,10 @@
 
 generator client {
   provider = "prisma-client-js"
+  // Required for Vercel deployment
+  output   = "./generated/client"
+  // Enable Edge compatibility
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
