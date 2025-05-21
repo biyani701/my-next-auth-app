@@ -25,7 +25,7 @@ const config = {
   organizationName: 'biyani701', // Usually your GitHub org/user name.
   projectName: 'my-next-auth-app', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
@@ -75,17 +75,17 @@ const config = {
             label: 'Documentation',
           },
           {
-            to: '/docs/providers',
+            to: '/providers',
             label: 'Providers',
             position: 'left',
           },
           {
-            to: '/docs/endpoints',
+            to: '/endpoints',
             label: 'Endpoints',
             position: 'left',
           },
           {
-            to: '/docs/testing',
+            to: '/testing',
             label: 'Testing',
             position: 'left',
           },
@@ -104,19 +104,19 @@ const config = {
             items: [
               {
                 label: 'Getting Started',
-                to: '/docs/intro',
+                to: '/intro',
               },
               {
                 label: 'Providers',
-                to: '/docs/providers',
+                to: '/providers',
               },
               {
                 label: 'Endpoints',
-                to: '/docs/endpoints',
+                to: '/endpoints',
               },
               {
                 label: 'Testing',
-                to: '/docs/testing',
+                to: '/testing',
               },
             ],
           },
