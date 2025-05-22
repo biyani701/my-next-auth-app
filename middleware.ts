@@ -34,7 +34,7 @@ const setCorsHeaders = (response: NextResponse, origin: string | null): void => 
 }
 
 // Map of legacy routes to their new locations in the (examples) route group
-const exampleRoutes = {
+const exampleRoutes: Record<string, string> = {
   '/server-example': '/(examples)/server-example',
   '/client-example': '/(examples)/client-example',
   '/middleware-example': '/(examples)/middleware-example',
@@ -49,7 +49,7 @@ export function middleware(request: NextRequest) {
 
   // Handle redirects for example routes
   const pathname = request.nextUrl.pathname;
-  if (exampleRoutes[pathname]) {
+  if (pathname in exampleRoutes) {
     console.log(`[middleware] Redirecting from ${pathname} to ${exampleRoutes[pathname]}`);
     return NextResponse.redirect(new URL(exampleRoutes[pathname], request.url));
   }
