@@ -33,40 +33,87 @@ function getTailwindVersion() {
 
 // Main function
 function ensureTailwindSetup() {
-  const tailwindVersion = getTailwindVersion();
-  console.log(`Detected Tailwind CSS version: ${tailwindVersion || 'Not installed'}`);
-  
-  // Check if we need @tailwindcss/postcss
-  const needsPostcssPlugin = tailwindVersion && tailwindVersion.startsWith('4');
-  const hasPostcssPlugin = isPackageInstalled('@tailwindcss/postcss');
-  
-  if (needsPostcssPlugin && !hasPostcssPlugin) {
-    console.log('Tailwind CSS v4+ detected but @tailwindcss/postcss is not installed.');
-    console.log('Installing @tailwindcss/postcss...');
-    
+  // Check if tailwindcss is installed
+  if (!isPackageInstalled('tailwindcss')) {
+    console.log('Tailwind CSS is not installed. Installing...');
     if (isVercel) {
-      // On Vercel, we need to install the package
-      execSync('npm install @tailwindcss/postcss', { stdio: 'inherit' });
+      execSync('npm install tailwindcss@4.1.7', { stdio: 'inherit' });
     } else {
       console.log('Not running on Vercel. Please install manually:');
-      console.log('npm install @tailwindcss/postcss');
+      console.log('npm install tailwindcss@4.1.7');
     }
-  } else if (needsPostcssPlugin && hasPostcssPlugin) {
-    console.log('Tailwind CSS v4+ and @tailwindcss/postcss are both installed. Configuration is correct.');
-  } else if (!needsPostcssPlugin && tailwindVersion) {
-    console.log('Using Tailwind CSS v3 or earlier. No additional packages needed.');
+  } else {
+    const tailwindVersion = getTailwindVersion();
+    console.log(`Tailwind CSS is installed (version ${tailwindVersion}).`);
+
+    // Check if we need to upgrade to v4
+    if (tailwindVersion && !tailwindVersion.startsWith('4')) {
+      console.log('Upgrading Tailwind CSS to v4...');
+      if (isVercel) {
+        execSync('npm install tailwindcss@4.1.7', { stdio: 'inherit' });
+      } else {
+        console.log('Not running on Vercel. Please upgrade manually:');
+        console.log('npm install tailwindcss@4.1.7');
+      }
+    }
   }
-  
+
+  // Check if @tailwindcss/postcss is installed
+  if (!isPackageInstalled('@tailwindcss/postcss')) {
+    console.log('@tailwindcss/postcss is not installed. Installing...');
+    if (isVercel) {
+      execSync('npm install @tailwindcss/postcss@4.1.7', { stdio: 'inherit' });
+    } else {
+      console.log('Not running on Vercel. Please install manually:');
+      console.log('npm install @tailwindcss/postcss@4.1.7');
+    }
+  } else {
+    console.log('@tailwindcss/postcss is installed.');
+  }
+
+  // Check if autoprefixer is installed
+  if (!isPackageInstalled('autoprefixer')) {
+    console.log('Autoprefixer is not installed. Installing...');
+    if (isVercel) {
+      execSync('npm install autoprefixer', { stdio: 'inherit' });
+    } else {
+      console.log('Not running on Vercel. Please install manually:');
+      console.log('npm install autoprefixer');
+    }
+  } else {
+    console.log('Autoprefixer is installed.');
+  }
+
   // Ensure PostCSS config is correct
   const postcssConfigPath = path.join(process.cwd(), 'postcss.config.js');
   if (fs.existsSync(postcssConfigPath)) {
     console.log('PostCSS configuration file exists.');
+
+    // Update the PostCSS config to use @tailwindcss/postcss
+    const postcssConfig = `
+/**
+ * PostCSS configuration for Tailwind CSS v4
+ * This ensures compatibility with Vercel deployment
+ */
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    'autoprefixer': {},
+  },
+};
+`;
+    fs.writeFileSync(postcssConfigPath, postcssConfig);
+    console.log('Updated PostCSS configuration file for Tailwind CSS v4.');
   } else {
     console.log('PostCSS configuration file not found. Creating one...');
     const postcssConfig = `
+/**
+ * PostCSS configuration for Tailwind CSS v4
+ * This ensures compatibility with Vercel deployment
+ */
 module.exports = {
   plugins: {
-    ${needsPostcssPlugin ? "'@tailwindcss/postcss': {}" : "'tailwindcss': {}"},
+    '@tailwindcss/postcss': {},
     'autoprefixer': {},
   },
 };

@@ -34,12 +34,16 @@ import Keycloak from "next-auth/providers/keycloak"
 // import Vipps from "next-auth/providers/vipps"
 // import WorkOS from "next-auth/providers/workos"
 // import Zoom from "next-auth/providers/zoom"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { prisma } from "./lib/prisma"
+
+// Import these for fallback if DATABASE_URL is not set
 import { createStorage } from "unstorage"
 import memoryDriver from "unstorage/drivers/memory"
 import vercelKVDriver from "unstorage/drivers/vercel-kv"
 import { UnstorageAdapter } from "@auth/unstorage-adapter"
 
-// Configure storage for Auth.js
+// Configure storage for Auth.js (fallback if DATABASE_URL is not set)
 const storage = createStorage({
   driver: (() => {
     // Check if we're on Vercel and have the required KV configuration
@@ -98,7 +102,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     brandColor: "#0070f3",
     buttonText: "#ffffff",
   },
-  adapter: UnstorageAdapter(storage),
+  // Use PrismaAdapter if DATABASE_URL is set, otherwise fall back to UnstorageAdapter
+  adapter: process.env.DATABASE_URL ? PrismaAdapter(prisma) : UnstorageAdapter(storage),
   trustHost: true,
   // Set the URL for callbacks
   pages: {

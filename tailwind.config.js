@@ -7,6 +7,7 @@ module.exports = {
     "./app/**/*.{js,jsx,ts,tsx}",
     "./src/**/*.{js,jsx,ts,tsx}",
     "./auth.ts",
+    "./lib/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     container: {
