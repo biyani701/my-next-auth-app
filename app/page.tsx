@@ -1,7 +1,7 @@
 import Image from "next/image"
 import { auth } from ".."
-import CustomLink from "@/components/custom-link"
-import { SignIn } from "@/components/auth-components"
+import CustomLink from "../components/custom-link"
+import { SignIn } from "../components/auth-components"
 
 // Define provider types
 type ProviderID = 'github' | 'google' | 'facebook' | 'auth0' | 'keycloak' | 'credentials';

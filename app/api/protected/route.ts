@@ -1,4 +1,4 @@
-import { auth } from "../.."
+import { auth } from "../../.."
 
 export const GET = auth((req) => {
   if (req.auth) {

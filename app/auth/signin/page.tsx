@@ -1,6 +1,6 @@
 import { auth } from "../../.."
-import { SignIn } from "@/components/auth-components"
-import { ProviderButtons } from "@/components/provider-buttons"
+import { SignIn } from "../../../components/auth-components"
+import { ProviderButtons } from "../../../components/provider-buttons"
 import Link from "next/link"
 import Image from "next/image"
 
