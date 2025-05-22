@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 
 // Get allowed origins from environment variable
 const getAllowedOrigins = (): string[] => {
-  const originsEnv = process.env.ALLOWED_ORIGINS || 'http://localhost:3775,https://vishal.biyani.xyz'
+  const originsEnv = process.env.ALLOWED_ORIGINS || 'http://localhost:3775,https://vishal.biyani.xyz,https://my-next-auth-app-ten.vercel.app,https://my-next-auth-ff7k8dsoq-vishals-projects-d59fa5fe.vercel.app'
   return originsEnv.split(',').map(origin => origin.trim())
 }
 

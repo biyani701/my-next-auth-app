@@ -60,19 +60,34 @@ const storage = createStorage({
 
 // We'll use the standard adapter but handle account linking in the callbacks
 
-// Determine the base URL based on the environment
-const getBaseUrl = () => {
-  // If AUTH_URL is provided, use it
+// Define a type for request-like objects
+type RequestLike = { headers: Record<string, string | string[] | undefined> }
+
+// More robust function to determine the base URL based on environment and request context
+export function getBaseUrl(req?: RequestLike): string {
+  // 1. Use explicitly configured AUTH_URL first (recommended in production)
   if (process.env.AUTH_URL) {
     return process.env.AUTH_URL;
   }
 
-  // In development, use localhost
+  // 2. If inside a request (server-side), infer from headers
+  if (req) {
+    const proto = (req.headers['x-forwarded-proto'] || 'https') as string;
+    const host = req.headers.host as string;
+    return `${proto}://${host}`;
+  }
+
+  // 3. Local dev fallback
   if (process.env.NODE_ENV === 'development') {
     return 'http://localhost:3000';
   }
 
-  // In production, use the Vercel URL
+  // 4. Use Vercel's deployment URL (available at build time)
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  // 5. Last resort fallback to production URL
   return 'https://my-next-auth-app-ten.vercel.app';
 };
 
@@ -205,20 +220,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return true;
     },
     async redirect({ url }) {
-      // Use our dynamic base URL
+      // Use our dynamic base URL (without request context since it's not available in this callback)
       const dynamicBaseUrl = getBaseUrl();
       console.log(`[auth] Redirect - URL: ${url}, BaseUrl: ${dynamicBaseUrl}`);
 
-      // Allow redirects to the portfolio app (development)
-      if (url.startsWith('http://localhost:3775')) {
-        console.log(`[auth] Allowing redirect to portfolio app (dev): ${url}`);
-        return url;
-      }
+      // Get allowed origins from environment variable
+      const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3775,https://vishal.biyani.xyz')
+        .split(',').map(origin => origin.trim());
 
-      // Allow redirects to the portfolio app (production)
-      if (url.startsWith('https://vishal.biyani.xyz')) {
-        console.log(`[auth] Allowing redirect to portfolio app (prod): ${url}`);
-        return url;
+      console.log(`[auth] Allowed origins: ${allowedOrigins.join(', ')}`);
+
+      // Check if the URL starts with any of the allowed origins
+      for (const origin of allowedOrigins) {
+        if (url.startsWith(origin)) {
+          console.log(`[auth] Allowing redirect to allowed origin: ${url}`);
+          return url;
+        }
       }
 
       // If the URL contains auth-callback, it's from our portfolio app
@@ -240,9 +257,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return `${dynamicBaseUrl}${url}`;
       }
 
-      // If the URL is absolute but on the same origin as the site, allow it
       try {
         const urlOrigin = new URL(url).origin;
+
+        // Allow redirects to any vercel.app domain (for preview deployments)
+        if (urlOrigin.includes('vercel.app')) {
+          console.log(`[auth] Allowing redirect to Vercel preview: ${url}`);
+          return url;
+        }
+
+        // If the URL is absolute but on the same origin as the site, allow it
         if (urlOrigin === dynamicBaseUrl) {
           console.log(`[auth] Same origin URL, allowing: ${url}`);
           return url;
