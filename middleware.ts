@@ -33,11 +33,26 @@ const setCorsHeaders = (response: NextResponse, origin: string | null): void => 
   }
 }
 
+// Map of legacy routes to their new locations in the (examples) route group
+const exampleRoutes = {
+  '/server-example': '/(examples)/server-example',
+  '/client-example': '/(examples)/client-example',
+  '/middleware-example': '/(examples)/middleware-example',
+  '/api-example': '/(examples)/api-example',
+};
+
 // Middleware function that adds CORS headers and handles authentication
 export function middleware(request: NextRequest) {
   // Get the origin from the request
   const origin = request.headers.get('origin')
   console.log(`[middleware] Request from origin: ${origin || 'unknown'} for path: ${request.nextUrl.pathname}`)
+
+  // Handle redirects for example routes
+  const pathname = request.nextUrl.pathname;
+  if (exampleRoutes[pathname]) {
+    console.log(`[middleware] Redirecting from ${pathname} to ${exampleRoutes[pathname]}`);
+    return NextResponse.redirect(new URL(exampleRoutes[pathname], request.url));
+  }
 
   // Handle OPTIONS requests for CORS preflight
   if (request.method === 'OPTIONS') {
