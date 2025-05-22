@@ -1,4 +1,4 @@
-import { auth } from "auth"
+import { auth } from "../../.."
 import { SignIn } from "@/components/auth-components"
 import { ProviderButtons } from "@/components/provider-buttons"
 import Link from "next/link"

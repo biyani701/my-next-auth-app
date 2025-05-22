@@ -1,4 +1,4 @@
-import { signIn } from "auth"
+import { signIn } from "../../../.."
 import { NextRequest } from "next/server"
 
 // Use Node.js runtime for Prisma compatibility

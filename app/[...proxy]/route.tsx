@@ -1,4 +1,4 @@
-import { auth } from "@/auth"
+import { auth } from "../.."
 import { NextRequest } from "next/server"
 
 // Review if we need this, and why

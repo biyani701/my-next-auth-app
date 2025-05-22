@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { auth } from "auth"
+import { auth } from ".."
 import CustomLink from "@/components/custom-link"
 import { SignIn } from "@/components/auth-components"
 
@@ -68,7 +68,7 @@ const providerIcons: Record<ProviderID, JSX.Element> = {
     <svg viewBox="0 0 24 24" className="h-6 w-6 mr-3">
       <circle cx="12" cy="12" r="10" fill="#805AD5" />
       <rect x="9" y="8" width="6" height="3" rx="1" fill="white" />
-      <path 
+      <path
         fill="white"
         d="M16 11H8a1 1 0 00-1 1v4a1 1 0 001 1h8a1 1 0 001-1v-4a1 1 0 00-1-1zm-2 3a1 1 0 11-2 0 1 1 0 012 0zm-3 0a1 1 0 11-2 0 1 1 0 012 0z"
       />
