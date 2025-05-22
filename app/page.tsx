@@ -154,7 +154,7 @@ export default async function Index() {
               alt="Auth Logo"
               width={32}
               height={32}
-              className="rounded-md"
+              className="rounded-md w-8 h-8"
             />
             <span className="font-semibold text-gray-700">Next Auth Example</span>
           </div>
@@ -190,12 +190,13 @@ export default async function Index() {
       <div className="w-full max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="relative w-24 h-24 mx-auto mb-6 rounded-full bg-white p-2 shadow-lg ring-2 ring-blue-100">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white p-2 shadow-lg ring-2 ring-blue-100 flex items-center justify-center logo-container">
             <Image
               src="/logo.png"
               alt="Portfolio Logo"
-              fill
-              className="object-contain p-2"
+              width={64}
+              height={64}
+              className="object-contain p-2 w-16 h-16"
             />
           </div>
           <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -326,7 +327,7 @@ export default async function Index() {
                 alt="Auth Logo"
                 width={24}
                 height={24}
-                className="rounded-md mr-2"
+                className="rounded-md mr-2 w-6 h-6"
               />
               <span className="text-sm text-gray-500">© {new Date().getFullYear()} Next Auth Example</span>
             </div>

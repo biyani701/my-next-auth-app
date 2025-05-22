@@ -102,8 +102,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     brandColor: "#0070f3",
     buttonText: "#ffffff",
   },
-  // Use PrismaAdapter if DATABASE_URL is set, otherwise fall back to UnstorageAdapter
-  adapter: process.env.DATABASE_URL ? PrismaAdapter(prisma) : UnstorageAdapter(storage),
+  // Use UnstorageAdapter for now until database connectivity issues are resolved
+  adapter: UnstorageAdapter(storage),
   trustHost: true,
   // Set the URL for callbacks
   pages: {
@@ -166,8 +166,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
         path: '/',
         secure: process.env.NODE_ENV !== 'development',
-        domain: process.env.NODE_ENV === 'development' ? undefined :
-                process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
       }
     },
     callbackUrl: {
@@ -177,8 +175,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
         path: '/',
         secure: process.env.NODE_ENV !== 'development',
-        domain: process.env.NODE_ENV === 'development' ? undefined :
-                process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
       }
     },
     csrfToken: {
@@ -188,8 +184,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
         path: '/',
         secure: process.env.NODE_ENV !== 'development',
-        domain: process.env.NODE_ENV === 'development' ? undefined :
-                process.env.VERCEL ? 'my-next-auth-app-ten.vercel.app' : undefined,
       }
     }
   },

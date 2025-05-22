@@ -46,29 +46,16 @@ function ensureTailwindSetup() {
     const tailwindVersion = getTailwindVersion();
     console.log(`Tailwind CSS is installed (version ${tailwindVersion}).`);
 
-    // Check if we need to upgrade to v4
-    if (tailwindVersion && !tailwindVersion.startsWith('4')) {
-      console.log('Upgrading Tailwind CSS to v4...');
+    // Ensure we're using Tailwind v3
+    if (tailwindVersion && !tailwindVersion.startsWith('3')) {
+      console.log('Downgrading Tailwind CSS to v3...');
       if (isVercel) {
-        execSync('npm install tailwindcss@4.1.7', { stdio: 'inherit' });
+        execSync('npm install tailwindcss@3.4.1', { stdio: 'inherit' });
       } else {
-        console.log('Not running on Vercel. Please upgrade manually:');
-        console.log('npm install tailwindcss@4.1.7');
+        console.log('Not running on Vercel. Please downgrade manually:');
+        console.log('npm install tailwindcss@3.4.1');
       }
     }
-  }
-
-  // Check if @tailwindcss/postcss is installed
-  if (!isPackageInstalled('@tailwindcss/postcss')) {
-    console.log('@tailwindcss/postcss is not installed. Installing...');
-    if (isVercel) {
-      execSync('npm install @tailwindcss/postcss@4.1.7', { stdio: 'inherit' });
-    } else {
-      console.log('Not running on Vercel. Please install manually:');
-      console.log('npm install @tailwindcss/postcss@4.1.7');
-    }
-  } else {
-    console.log('@tailwindcss/postcss is installed.');
   }
 
   // Check if autoprefixer is installed
@@ -89,31 +76,31 @@ function ensureTailwindSetup() {
   if (fs.existsSync(postcssConfigPath)) {
     console.log('PostCSS configuration file exists.');
 
-    // Update the PostCSS config to use @tailwindcss/postcss
+    // Update the PostCSS config to use tailwindcss
     const postcssConfig = `
 /**
- * PostCSS configuration for Tailwind CSS v4
+ * PostCSS configuration for Tailwind CSS v3
  * This ensures compatibility with Vercel deployment
  */
 module.exports = {
   plugins: {
-    '@tailwindcss/postcss': {},
+    'tailwindcss': {},
     'autoprefixer': {},
   },
 };
 `;
     fs.writeFileSync(postcssConfigPath, postcssConfig);
-    console.log('Updated PostCSS configuration file for Tailwind CSS v4.');
+    console.log('Updated PostCSS configuration file for Tailwind CSS v3.');
   } else {
     console.log('PostCSS configuration file not found. Creating one...');
     const postcssConfig = `
 /**
- * PostCSS configuration for Tailwind CSS v4
+ * PostCSS configuration for Tailwind CSS v3
  * This ensures compatibility with Vercel deployment
  */
 module.exports = {
   plugins: {
-    '@tailwindcss/postcss': {},
+    'tailwindcss': {},
     'autoprefixer': {},
   },
 };

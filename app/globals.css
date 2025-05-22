@@ -45,3 +45,79 @@
     @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];
   }
 }
+
+/* Ensure common layout classes are included */
+.layout-container {
+  @apply container mx-auto px-4;
+}
+
+.layout-flex {
+  @apply flex flex-col min-h-screen;
+}
+
+.layout-header {
+  @apply py-4 border-b border-gray-200;
+}
+
+.layout-main {
+  @apply flex-grow py-8;
+}
+
+.layout-footer {
+  @apply py-4 border-t border-gray-200 text-center text-sm text-gray-500;
+}
+
+/* Common text styles */
+.heading-large {
+  @apply text-3xl font-bold;
+}
+
+.heading-medium {
+  @apply text-2xl font-semibold;
+}
+
+.heading-small {
+  @apply text-xl font-semibold;
+}
+
+.text-link {
+  @apply text-blue-600 hover:text-blue-800;
+}
+
+/* Common spacing */
+.spacing-y {
+  @apply space-y-2;
+}
+
+.spacing-x {
+  @apply space-x-2;
+}
+
+/* Fix for Next.js Image component */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ensure images in specific containers are properly sized */
+.logo-container img,
+[class*="logo"] img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Fix for Next.js Image span wrapper */
+span[style*="box-sizing: border-box; display: inline-block; overflow: hidden; width: initial; height: initial; background: none; opacity: 1; border: 0px; margin: 0px; padding: 0px; position: relative; max-width: 100%;"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Fix for Next.js Image span wrapper - second level */
+span[style*="box-sizing: border-box; display: block; width: initial; height: initial; background: none; opacity: 1; border: 0px; margin: 0px; padding: 0px; max-width: 100%;"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}

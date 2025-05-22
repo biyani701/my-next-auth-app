@@ -24,9 +24,9 @@ export function MainNav() {
           <Image
             src="/logo.png"
             alt="Home"
-            width="32"
-            height="32"
-            className="min-w-8"
+            width={32}
+            height={32}
+            className="w-8 h-8"
           />
         </Button>
       </CustomLink>

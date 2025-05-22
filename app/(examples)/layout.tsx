@@ -15,7 +15,7 @@ export default function ExamplesLayout({ children }: { children: ReactNode }) {
               alt="Auth Logo"
               width={32}
               height={32}
-              className="rounded-md"
+              className="rounded-md w-8 h-8"
             />
             <span className="font-semibold">Next Auth Example</span>
           </Link>

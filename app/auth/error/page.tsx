@@ -71,13 +71,15 @@ function ErrorContent() {
     <div className="flex flex-col items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <Image
-            src="/logo.png"
-            alt="Portfolio Logo"
-            width={80}
-            height={80}
-            className="mx-auto mb-4"
-          />
+          <div className="logo-container w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+            <Image
+              src="/logo.png"
+              alt="Portfolio Logo"
+              width={64}
+              height={64}
+              className="mx-auto w-16 h-16"
+            />
+          </div>
           <h1 className="text-3xl font-bold mb-2 text-red-600">{title}</h1>
           <p className="text-gray-600 mb-8">
             {message}

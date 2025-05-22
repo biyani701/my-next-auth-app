@@ -1,10 +1,10 @@
 /**
- * PostCSS configuration for Tailwind CSS v4
+ * PostCSS configuration for Tailwind CSS v3
  * This ensures compatibility with Vercel deployment
  */
 module.exports = {
   plugins: {
-    '@tailwindcss/postcss': {},
+    'tailwindcss': {},
     'autoprefixer': {},
   },
 }

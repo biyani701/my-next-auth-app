@@ -11,13 +11,13 @@ export default async function SignInPage() {
     <div className="flex flex-col items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <div className="bg-blue-600 dark:bg-blue-800 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <div className="bg-blue-600 dark:bg-blue-800 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-lg logo-container">
             <Image
               src="/logo.png"
               alt="Portfolio Logo"
-              width={60}
-              height={60}
-              className="mx-auto"
+              width={48}
+              height={48}
+              className="mx-auto w-12 h-12"
             />
           </div>
           <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Authentication</h1>
