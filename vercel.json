@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run vercel-build",
   "installCommand": "npm install",
   "framework": "nextjs",
   "outputDirectory": ".next",
-  "devCommand": "npm run dev"
+  "devCommand": "npm run dev",
+  "build": {
+    "env": {
+      "PRISMA_GENERATE_DURING_BUILD": "true"
+    }
+  }
 }
