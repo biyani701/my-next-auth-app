@@ -193,7 +193,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     authorized({ request, auth }) {
       const { pathname } = request.nextUrl
-      if (pathname === "/middleware-example") return !!auth
+      if (pathname === "/(examples)/middleware-example") return !!auth
       return true
     },
     jwt({ token, trigger, session, account }) {
