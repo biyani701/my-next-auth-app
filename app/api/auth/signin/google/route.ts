@@ -1,4 +1,4 @@
-import { auth, signIn } from "../../../../.."
+import { auth, signIn } from "../../../../../auth"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
