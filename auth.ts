@@ -243,7 +243,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       // Handle Keycloak tokens
-      if (account?.provider === "keycloak") {
+      if (account?.provider === "keycloak" && account?.access_token) {
         return { ...token, accessToken: account.access_token }
       }
 
@@ -274,7 +274,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (existingUser) {
             // Check if the user already has an account with this provider
             const existingAccount = existingUser.accounts.find(
-              (acc) => acc.provider === account.provider
+              (acc) => acc.provider === account?.provider
             );
 
             if (!existingAccount) {
