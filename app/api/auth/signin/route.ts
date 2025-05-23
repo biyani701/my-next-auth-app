@@ -1,10 +1,11 @@
 import { signIn } from "../../../.."
 import { NextRequest } from "next/server"
+import { withRateLimit } from "@/lib/rate-limit"
 
 // Use Node.js runtime for Prisma compatibility
 export const runtime = "nodejs"
 
-export async function GET(request: NextRequest) {
+async function handler(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const callbackUrl = searchParams.get("callbackUrl") || "/"
   const provider = searchParams.get("provider") || "github"
@@ -14,6 +15,9 @@ export async function GET(request: NextRequest) {
   // Sign in with the specified provider (defaults to GitHub)
   return signIn(provider, { redirectTo: callbackUrl })
 }
+
+// Apply rate limiting to the signin route
+export const GET = withRateLimit(handler, true)
 
 export async function POST(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams

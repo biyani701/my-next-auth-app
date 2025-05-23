@@ -14,6 +14,12 @@ Welcome to the documentation for the Auth.js integration in your portfolio appli
 
 - **Multiple Authentication Providers**: Support for OAuth providers like GitHub, Google, Auth0, Facebook, and Keycloak
 - **Secure by Default**: Uses JWT tokens with secure HTTP-only cookies
+- **Role-Based Authentication**: Control access with user, moderator, and admin roles
+- **Database Integration**: PostgreSQL with Prisma for persistent storage
+- **Session Management**: Choose between JWT or database sessions
+- **Performance Optimizations**: Connection pooling and rate limiting
+- **Data Retention**: Configurable session cleanup and retention policies
+- **Admin Dashboard**: Manage users, roles, and sessions
 - **Customizable**: Easily customize the authentication flow and UI
 - **TypeScript Support**: Full TypeScript support for type safety
 - **Testing Utilities**: Tools for testing authentication in your application
@@ -92,3 +98,6 @@ Explore the following sections to learn more about authentication in your portfo
 - [Authentication Providers](/providers): Learn about the available authentication providers
 - [Auth.js Endpoints](/endpoints): Understand the API endpoints provided by Auth.js
 - [Testing Authentication](/testing): Learn how to test authentication in your application
+- [Database Configuration](/database): Configure and optimize your database connection
+- [Role-Based Authentication](/role-based-auth): Implement and manage user roles
+- [Privacy Policy](/privacy-policy) and [Terms of Service](/terms-of-service): Legal documents for your application

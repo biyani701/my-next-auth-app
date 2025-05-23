@@ -4,32 +4,32 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Multiple Authentication Providers',
+    Svg: require('@site/static/img/auth-providers.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Integrate with popular OAuth providers like GitHub, Google, Auth0,
+        Facebook, and Keycloak. Support for email/password and custom authentication.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Role-Based Authentication',
+    Svg: require('@site/static/img/role-based-auth.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Control access with user, moderator, and admin roles. Easily implement
+        permission-based access control in your application.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'Database Integration',
+    Svg: require('@site/static/img/database.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        PostgreSQL with Prisma for persistent storage. Includes connection pooling,
+        rate limiting, and configurable data retention strategies.
       </>
     ),
   },

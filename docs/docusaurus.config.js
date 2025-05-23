@@ -43,10 +43,6 @@ const config = {
       ({
         docs: {
           sidebarPath: './sidebars.js',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/biyani701/my-next-auth-app/tree/main/docs/',
           routeBasePath: '/',
         },
         theme: {
@@ -59,8 +55,8 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      // Auth.js social card
+      image: 'img/logo.svg',
       navbar: {
         title: 'Auth.js Documentation',
         logo: {

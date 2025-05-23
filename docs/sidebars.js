@@ -20,6 +20,8 @@ const sidebars = {
     'providers',
     'endpoints',
     'testing',
+    'privacy-policy',
+    'terms-of-service',
     {
       type: 'category',
       label: 'Providers',
@@ -30,6 +32,14 @@ const sidebars = {
         'providers/facebook',
         'providers/keycloak',
         'providers/credentials',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Advanced',
+      items: [
+        'database',
+        'role-based-auth',
       ],
     },
   ]

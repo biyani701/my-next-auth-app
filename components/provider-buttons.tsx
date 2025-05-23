@@ -37,6 +37,28 @@ const ProviderIcons = {
       />
     </svg>
   ),
+  keycloak: (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
+      <path
+        fill="currentColor"
+        d="M12 0L1.354 6v12L12 24l10.646-6V6L12 0zm7.925 16.515l-7.925 4.475-7.925-4.475V7.485L12 3.01l7.925 4.475v9.03z"
+      />
+      <path
+        fill="currentColor"
+        d="M12 6.277L7.099 9.144v5.712L12 17.723l4.901-2.867V9.144L12 6.277zm3.921 7.633L12 16.337l-3.921-2.427V9.99L12 7.663l3.921 2.427v4.02z"
+      />
+    </svg>
+  ),
+  "test-credentials": (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 mr-2">
+      <circle cx="12" cy="12" r="10" fill="currentColor" />
+      <rect x="9" y="8" width="6" height="3" rx="1" fill="white" />
+      <path
+        fill="white"
+        d="M16 11H8a1 1 0 00-1 1v4a1 1 0 001 1h8a1 1 0 001-1v-4a1 1 0 00-1-1zm-2 3a1 1 0 11-2 0 1 1 0 012 0zm-3 0a1 1 0 11-2 0 1 1 0 012 0z"
+      />
+    </svg>
+  ),
 }
 
 // Provider button styles
@@ -45,6 +67,8 @@ const ProviderStyles = {
   google: "bg-white hover:bg-gray-100 text-gray-900 border border-gray-300",
   facebook: "bg-[#1877F2] hover:bg-[#166FE5] text-white",
   auth0: "bg-[#EB5424] hover:bg-[#D44A1A] text-white",
+  keycloak: "bg-green-700 hover:bg-green-800 text-white",
+  "test-credentials": "bg-purple-600 hover:bg-purple-700 text-white",
 }
 
 export function ProviderButtons() {
@@ -65,6 +89,8 @@ export function ProviderButtons() {
     { id: "google", name: "Google" },
     { id: "facebook", name: "Facebook" },
     { id: "auth0", name: "Auth0" },
+    { id: "keycloak", name: "Keycloak" },
+    { id: "test-credentials", name: "Credentials" },
   ]
 
   return (

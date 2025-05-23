@@ -12,6 +12,13 @@ export const prisma =
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   })
 
+// Log database connection information in development
+if (process.env.NODE_ENV === 'development') {
+  console.log('[prisma] Database connection initialized');
+  console.log('[prisma] Connection pooling is handled automatically by Prisma');
+}
+
+// Keep a single instance of Prisma Client in development
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
 export default prisma

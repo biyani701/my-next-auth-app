@@ -33,13 +33,8 @@ const setCorsHeaders = (response: NextResponse, origin: string | null): void => 
   }
 }
 
-// Map of legacy routes to their new locations in the (examples) route group
-const exampleRoutes: Record<string, string> = {
-  '/server-example': '/(examples)/server-example',
-  '/client-example': '/(examples)/client-example',
-  '/middleware-example': '/(examples)/middleware-example',
-  '/api-example': '/(examples)/api-example',
-};
+// Note: Route groups like (examples) are just for file organization
+// They should not appear in URLs - the middleware will redirect if they do
 
 // Middleware function that adds CORS headers and handles authentication
 export function middleware(request: NextRequest) {
@@ -47,12 +42,16 @@ export function middleware(request: NextRequest) {
   const origin = request.headers.get('origin')
   console.log(`[middleware] Request from origin: ${origin || 'unknown'} for path: ${request.nextUrl.pathname}`)
 
-  // Handle redirects for example routes
+  // Check for direct access to (examples) routes which should be hidden
   const pathname = request.nextUrl.pathname;
-  if (pathname in exampleRoutes) {
-    console.log(`[middleware] Redirecting from ${pathname} to ${exampleRoutes[pathname]}`);
-    return NextResponse.redirect(new URL(exampleRoutes[pathname], request.url));
+  if (pathname.includes('(examples)')) {
+    // Remove (examples) from the path and redirect
+    const cleanPath = pathname.replace('/(examples)', '');
+    console.log(`[middleware] Removing route group from URL: ${pathname} -> ${cleanPath}`);
+    return NextResponse.redirect(new URL(cleanPath, request.url));
   }
+
+  // Now the URLs will work correctly without the route group in the path
 
   // Handle OPTIONS requests for CORS preflight
   if (request.method === 'OPTIONS') {

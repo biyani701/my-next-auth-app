@@ -48,7 +48,6 @@ const storage = createStorage({
   driver: (() => {
     // Check if we're on Vercel and have the required KV configuration
     if (process.env.VERCEL && process.env.AUTH_KV_REST_API_URL && process.env.AUTH_KV_REST_API_TOKEN) {
-      console.log('[auth] Using Vercel KV storage');
       return vercelKVDriver({
         url: process.env.AUTH_KV_REST_API_URL,
         token: process.env.AUTH_KV_REST_API_TOKEN,
@@ -56,7 +55,6 @@ const storage = createStorage({
       });
     } else {
       // Fall back to memory driver if not on Vercel or missing KV config
-      console.log('[auth] Using memory storage (no database configuration found)');
       return memoryDriver();
     }
   })(),
@@ -102,8 +100,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     brandColor: "#0070f3",
     buttonText: "#ffffff",
   },
-  // Use UnstorageAdapter for now until database connectivity issues are resolved
-  adapter: UnstorageAdapter(storage),
+  // Use PrismaAdapter if DATABASE_URL is set, otherwise fall back to memory storage
+  adapter: process.env.DATABASE_URL
+    ? (() => {
+        console.log('[auth] Using database storage with Prisma adapter');
+        return PrismaAdapter(prisma);
+      })()
+    : (() => {
+        console.log('[auth] Using memory storage (no database configuration found)');
+        return UnstorageAdapter(storage);
+      })(),
   trustHost: true,
   // Set the URL for callbacks
   pages: {
@@ -117,31 +123,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId: process.env.AUTH0_CLIENT_ID,
       clientSecret: process.env.AUTH0_CLIENT_SECRET,
       issuer: `https://${process.env.AUTH0_ISSUER}`,
+      // Account linking is now handled in the signIn callback
     }),
     Facebook({
       clientId: process.env.AUTH_FACEBOOK_ID,
       clientSecret: process.env.AUTH_FACEBOOK_SECRET,
+      // Account linking is now handled in the signIn callback
     }),
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID,
       clientSecret: process.env.AUTH_GITHUB_SECRET,
+      // Account linking is now handled in the signIn callback
     }),
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      // Account linking is now handled in the signIn callback
     }),
     Keycloak({
       clientId: process.env.AUTH_KEYCLOAK_ID,
       clientSecret: process.env.AUTH_KEYCLOAK_SECRET,
       issuer: process.env.AUTH_KEYCLOAK_ISSUER,
-      name: "Keycloak"
+      name: "Keycloak",
+      // Account linking is now handled in the signIn callback
     }),
     // Add test credentials provider for testing
     Credentials({
       id: "test-credentials",
       name: "Test Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        email: {
+          label: "Email", type: "email"
+        },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
@@ -188,35 +201,130 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }
   },
   basePath: "/api/auth",
-  session: { strategy: "jwt" },
+  // Use SESSION_STRATEGY env var to determine session strategy (jwt or database)
+  session: {
+    strategy: (process.env.SESSION_STRATEGY === "database" ? "database" : "jwt")
+  },
   callbacks: {
     authorized({ request, auth }) {
       const { pathname } = request.nextUrl
-      if (pathname === "/(examples)/middleware-example") return !!auth
+
+      // Require authentication for middleware example
+      if (pathname === "/middleware-example") {
+        return !!auth
+      }
+
+      // Require admin role for admin pages
+      if (pathname.startsWith("/admin")) {
+        return auth?.user?.role === "admin"
+      }
+
+      // Require moderator or admin role for moderator pages
+      if (pathname.startsWith("/moderator")) {
+        return ["admin", "moderator"].includes(auth?.user?.role as string)
+      }
+
+      // Allow access to all other pages
       return true
     },
-    jwt({ token, trigger, session, account }) {
-      if (trigger === "update") token.name = session.user.name
+    async jwt({ token, trigger, session, account, user }) {
+      // If this is the first sign in, add the user's role to the token
+      if (user) {
+        token.role = user.role;
+      }
+
+      // Handle session updates
+      if (trigger === "update") {
+        token.name = session.user.name;
+        // Allow role updates if provided in the session update
+        if (session.user.role) {
+          token.role = session.user.role;
+        }
+      }
+
+      // Handle Keycloak tokens
       if (account?.provider === "keycloak") {
         return { ...token, accessToken: account.access_token }
       }
+
       return token
     },
     async session({ session, token }) {
-      if (token?.accessToken) session.accessToken = token.accessToken
+      // Add role and accessToken to the session
+      if (token?.role) session.user.role = token.role;
+      if (token?.accessToken) session.accessToken = token.accessToken;
       return session
     },
     // Handle account linking and sign-in
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile, email }) {
       // Log the sign-in attempt
       console.log("[auth][signIn] Sign-in attempt for:", user?.email, "with provider:", account?.provider);
 
-      // In Auth.js v5, we need to explicitly return true to allow sign-in
-      // This will fix the OAuthAccountNotLinked error
-      console.log("[auth][signIn] Allowing sign-in for user:", user?.email);
+      try {
+        // If the user is signing in with an OAuth provider and we have their email
+        if (account?.provider !== "credentials" && user?.email) {
+          // Check if a user with this email already exists
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
+            include: { accounts: true }
+          });
 
-      // Always return true to allow sign-in
-      return true;
+          console.log("[auth][signIn] Existing user check:", existingUser ? "Found" : "Not found");
+
+          if (existingUser) {
+            // Check if the user already has an account with this provider
+            const existingAccount = existingUser.accounts.find(
+              (acc) => acc.provider === account.provider
+            );
+
+            if (!existingAccount) {
+              console.log("[auth][signIn] Linking new provider to existing account");
+
+              // Manually create the account link
+              try {
+                // Make sure account is defined
+                if (account) {
+                  await prisma.account.create({
+                    data: {
+                      userId: existingUser.id,
+                      type: account.type || "oauth",
+                      provider: account.provider,
+                      providerAccountId: account.providerAccountId,
+                      refresh_token: account.refresh_token || null,
+                      access_token: account.access_token || null,
+                      expires_at: account.expires_at || null,
+                      token_type: account.token_type || null,
+                      scope: account.scope || null,
+                      id_token: account.id_token || null,
+                      session_state: account.session_state?.toString() || null
+                    }
+                  });
+                }
+
+                console.log("[auth][signIn] Successfully linked account for user:", existingUser.email);
+
+                // Return the existing user's ID to use this user instead of creating a new one
+                // This tells Auth.js to use the existing user instead of creating a new one
+                return true;
+              } catch (linkError) {
+                console.error("[auth][signIn] Error linking account:", linkError);
+                // If there's an error linking the account, still allow sign-in
+                return true;
+              }
+            } else {
+              console.log("[auth][signIn] User already has an account with this provider");
+            }
+          }
+        }
+
+        // For all other cases, allow sign-in
+        console.log("[auth][signIn] Allowing sign-in for user:", user?.email);
+        return true;
+      } catch (error) {
+        console.error("[auth][signIn] Error during sign-in:", error);
+        // Still allow sign-in even if there was an error checking for existing accounts
+        return true;
+      }
     },
     async redirect({ url }) {
       // Use our dynamic base URL (without request context since it's not available in this callback)
@@ -291,14 +399,80 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // but the email is already associated with another account
     async linkAccount({ user, account }) {
       console.log("[auth][linkAccount] Linking account for user:", user?.email, "with provider:", account?.provider);
+
+      try {
+        // Check if the user exists in the database
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          include: { accounts: true }
+        });
+
+        if (dbUser) {
+          console.log(`[auth][linkAccount] Found user in database with ${dbUser.accounts.length} linked accounts`);
+
+          // If this is the first account being linked, update the user's role to match what's in the database
+          if (dbUser.accounts.length === 0 && dbUser.role) {
+            console.log(`[auth][linkAccount] User has role '${dbUser.role}' in database`);
+          }
+
+          // Check if there are other users with the same email but different IDs
+          if (user.email) {
+            const otherUsersWithSameEmail = await prisma.user.findMany({
+              where: {
+                email: user.email,
+                NOT: { id: user.id }
+              },
+              include: { accounts: true }
+            });
+
+            if (otherUsersWithSameEmail.length > 0) {
+              console.log(`[auth][linkAccount] Found ${otherUsersWithSameEmail.length} other users with the same email`);
+
+              // Log the accounts for debugging
+              for (const otherUser of otherUsersWithSameEmail) {
+                console.log(`[auth][linkAccount] User ${otherUser.id} has ${otherUser.accounts.length} accounts`);
+                for (const acc of otherUser.accounts) {
+                  console.log(`[auth][linkAccount] - Provider: ${acc.provider}, ID: ${acc.providerAccountId}`);
+                }
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("[auth][linkAccount] Error checking user accounts:", error);
+      }
+
       // In Auth.js v5, returning nothing (or undefined) from this event handler
       // allows the account to be linked automatically
     },
     // This event is triggered when a user signs in
     async signIn({ user, account, isNewUser }) {
       console.log("[auth][event:signIn] User signed in:", user?.email, "with provider:", account?.provider);
+
       if (isNewUser) {
         console.log("[auth][event:signIn] This is a new user");
+
+        // For development, automatically set the first user as admin
+        if (process.env.NODE_ENV === "development") {
+          try {
+            // Check if this is the first user
+            const userCount = await prisma.user.count();
+
+            if (userCount === 1) {
+              console.log("[auth][event:signIn] First user detected, setting as admin");
+
+              // Update the user's role to admin
+              await prisma.user.update({
+                where: { id: user.id },
+                data: { role: "admin" }
+              });
+
+              console.log("[auth][event:signIn] User set as admin:", user.email);
+            }
+          } catch (error) {
+            console.error("[auth][event:signIn] Error setting admin role:", error);
+          }
+        }
       }
     },
   },
@@ -307,11 +481,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 declare module "next-auth" {
   interface Session {
     accessToken?: string
+    user: {
+      id?: string
+      name?: string | null
+      email?: string | null
+      image?: string | null
+      role?: string
+    }
+  }
+
+  interface User {
+    role?: string
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     accessToken?: string
+    role?: string
   }
 }
