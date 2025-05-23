@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { useSession } from "next-auth/react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
@@ -19,12 +18,43 @@ export default function SessionRefreshButton({
   className = "",
   redirectTo
 }: SessionRefreshButtonProps) {
-  const { data: session, update, status } = useSession({ required: false })
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [sessionData, setSessionData] = useState<{
+    data: any | null;
+    status: "loading" | "authenticated" | "unauthenticated";
+    update: () => Promise<any>;
+  }>({
+    data: null,
+    status: "loading",
+    update: async () => null
+  })
+
+  // Initialize session data after mount
+  useEffect(() => {
+    try {
+      setMounted(true)
+      // Import useSession dynamically to ensure it only runs on client
+      import("next-auth/react").then(({ useSession }) => {
+        try {
+          const { data, status, update } = useSession({ required: false })
+          setSessionData({ data, status, update })
+        } catch (error) {
+          console.error("Error initializing session:", error)
+        }
+      }).catch(error => {
+        console.error("Error importing useSession:", error)
+      })
+    } catch (error) {
+      console.error("Error in useEffect:", error)
+    }
+  }, [])
 
   const refreshSession = async () => {
-    if (!session?.user?.email) {
+    if (!mounted) return
+
+    if (!sessionData.data?.user?.email) {
       toast({
         title: "Not signed in",
         description: "You must be signed in to refresh your session",
@@ -45,14 +75,8 @@ export default function SessionRefreshButton({
       }
 
       if (data.roleChanged) {
-        // Update the session with the latest user data
-        await update({
-          ...session,
-          user: {
-            ...session.user,
-            role: data.databaseUser.role
-          }
-        })
+        // Update the session without arguments - Auth.js v5 will fetch the latest session data
+        await sessionData.update()
 
         toast({
           title: "Session updated",
@@ -83,13 +107,27 @@ export default function SessionRefreshButton({
     }
   }
 
+  // If not mounted yet, return a disabled button
+  if (!mounted) {
+    return (
+      <Button
+        variant={variant}
+        size={size}
+        className={className}
+        disabled={true}
+      >
+        Loading...
+      </Button>
+    )
+  }
+
   return (
     <Button
       variant={variant}
       size={size}
       className={className}
       onClick={refreshSession}
-      disabled={loading || !session}
+      disabled={loading || !sessionData.data}
     >
       {loading ? "Refreshing..." : "Refresh Session"}
     </Button>

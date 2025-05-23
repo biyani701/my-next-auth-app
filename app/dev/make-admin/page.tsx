@@ -33,13 +33,8 @@ export default function MakeAdminPage() {
       setResult(data)
 
       // Update the session to reflect the new role
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          role: "admin"
-        }
-      })
+      // In Auth.js v5, update() doesn't take arguments - it will fetch the latest session data
+      await update()
 
       // Refresh the page after a short delay
       setTimeout(() => {

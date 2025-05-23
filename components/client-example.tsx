@@ -24,7 +24,11 @@ const UpdateForm = () => {
             setName(e.target.value)
           }}
         />
-        <Button onClick={() => update({ user: { name } })} type="submit">
+        <Button onClick={() => {
+          // In Auth.js v5, update() doesn't take arguments
+          // This example won't work as expected in v5
+          update()
+        }} type="submit">
           Update
         </Button>
       </div>
