@@ -6,12 +6,14 @@ const TOAST_REMOVE_DELAY = 1000000
 
 type ToastActionElement = React.ReactElement
 
-export type Toast = {
+export interface Toast {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
   variant?: "default" | "destructive"
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 const actionTypes = {
@@ -84,10 +86,11 @@ const reducer = (state: State, action: Action): State => {
           toastTimeouts.delete(toastId)
         }
       } else {
-        for (const [id, timeout] of toastTimeouts.entries()) {
+        // Convert the entries iterator to an array to avoid TypeScript error
+        Array.from(toastTimeouts.entries()).forEach(([id, timeout]) => {
           clearTimeout(timeout)
           toastTimeouts.delete(id)
-        }
+        })
       }
 
       return {
@@ -127,17 +130,19 @@ function dispatch(action: Action) {
   })
 }
 
-type Toast = {
-  id: string
-  title?: React.ReactNode
-  description?: React.ReactNode
-  action?: ToastActionElement
-  variant?: "default" | "destructive"
-}
-
 export type ToasterToast = Toast
 
-function toast({ ...props }: Omit<Toast, "id">) {
+// Define the input type for the toast function
+type ToastProps = Omit<Toast, "id">
+
+// Define the return type for the toast function
+interface ToastReturn {
+  id: string
+  dismiss: () => void
+  update: (props: Partial<Toast>) => void
+}
+
+function toast(props: ToastProps): ToastReturn {
   const id = genId()
 
   const update = (props: Partial<Toast>) =>
@@ -147,16 +152,18 @@ function toast({ ...props }: Omit<Toast, "id">) {
     })
   const dismiss = () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id })
 
+  const toastProps = {
+    ...props,
+    id,
+    open: true,
+    onOpenChange: (open: boolean) => {
+      if (!open) dismiss()
+    },
+  }
+
   dispatch({
     type: actionTypes.ADD_TOAST,
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open: boolean) => {
-        if (!open) dismiss()
-      },
-    },
+    toast: toastProps,
   })
 
   return {
