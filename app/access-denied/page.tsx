@@ -8,9 +8,12 @@ import { Card } from "@/components/ui/card"
 import Link from "next/link"
 import SessionRefreshButton from "@/components/session-refresh-button"
 
+// Prevent static prerendering of this page
+export const dynamic = "force-dynamic"
+
 export default function AccessDeniedPage() {
   const router = useRouter()
-  const { data: session, update, status } = useSession()
+  const { data: session, update, status } = useSession({ required: false })
   const [loading, setLoading] = useState(false)
   const [countdown, setCountdown] = useState(10)
 
@@ -30,6 +33,11 @@ export default function AccessDeniedPage() {
 
   // Function to refresh the session
   const refreshSession = async () => {
+    if (!session) {
+      console.log("No session to refresh")
+      return
+    }
+
     setLoading(true)
     try {
       await update() // This will fetch the latest session data from the server
@@ -60,7 +68,11 @@ export default function AccessDeniedPage() {
             </div>
             <div className="ml-3">
               <p className="text-amber-700">
-                Your current role is <strong>{session?.user?.role || "none"}</strong>, but this page requires a higher role.
+                {status === "loading" ? (
+                  "Loading session information..."
+                ) : (
+                  <>Your current role is <strong>{session?.user?.role || "none"}</strong>, but this page requires a higher role.</>
+                )}
               </p>
             </div>
           </div>
@@ -82,17 +94,21 @@ export default function AccessDeniedPage() {
           <div className="space-y-2">
             <h2 className="text-lg font-medium">What can I do?</h2>
             <div className="flex flex-col space-y-2">
-              <SessionRefreshButton
-                className="w-full"
-                redirectTo="/admin"
-              />
+              {status !== "loading" && (
+                <>
+                  <SessionRefreshButton
+                    className="w-full"
+                    redirectTo="/admin"
+                  />
 
-              {process.env.NODE_ENV === "development" && (
-                <Link href="/dev/make-admin" className="w-full">
-                  <Button variant="outline" className="w-full">
-                    Make Me Admin (Dev Only)
-                  </Button>
-                </Link>
+                  {process.env.NODE_ENV === "development" && (
+                    <Link href="/dev/make-admin" className="w-full">
+                      <Button variant="outline" className="w-full">
+                        Make Me Admin (Dev Only)
+                      </Button>
+                    </Link>
+                  )}
+                </>
               )}
 
               <Link href="/" className="w-full">

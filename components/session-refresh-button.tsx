@@ -19,10 +19,10 @@ export default function SessionRefreshButton({
   className = "",
   redirectTo
 }: SessionRefreshButtonProps) {
-  const { data: session, update } = useSession()
+  const { data: session, update, status } = useSession({ required: false })
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  
+
   const refreshSession = async () => {
     if (!session?.user?.email) {
       toast({
@@ -32,18 +32,18 @@ export default function SessionRefreshButton({
       })
       return
     }
-    
+
     setLoading(true)
-    
+
     try {
       // First, check if the session needs to be refreshed
       const response = await fetch("/api/auth/refresh")
       const data = await response.json()
-      
+
       if (!response.ok) {
         throw new Error(data.error || "Failed to check session")
       }
-      
+
       if (data.roleChanged) {
         // Update the session with the latest user data
         await update({
@@ -53,12 +53,12 @@ export default function SessionRefreshButton({
             role: data.databaseUser.role
           }
         })
-        
+
         toast({
           title: "Session updated",
           description: `Your role has been updated to ${data.databaseUser.role}`,
         })
-        
+
         // Refresh the page or redirect
         if (redirectTo) {
           router.push(redirectTo)
@@ -82,7 +82,7 @@ export default function SessionRefreshButton({
       setLoading(false)
     }
   }
-  
+
   return (
     <Button
       variant={variant}
