@@ -24,7 +24,20 @@ async function handler(request: NextRequest) {
     "https://third-party-backend.authjs.dev"
 
   let url = request.nextUrl.href.replace(request.nextUrl.origin, backendUrl)
-  let result = await fetch(url, { headers, body: request.body })
+
+  // Only include body for methods that support it (not GET or HEAD)
+  const method = request.method.toUpperCase()
+  const fetchOptions: RequestInit = {
+    headers,
+    method
+  }
+
+  // Only add body for methods that support it
+  if (method !== 'GET' && method !== 'HEAD' && request.body) {
+    fetchOptions.body = request.body
+  }
+
+  let result = await fetch(url, fetchOptions)
 
   return stripContentEncoding(result)
 }

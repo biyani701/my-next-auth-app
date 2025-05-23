@@ -47,7 +47,7 @@ export default async function AdminPage() {
           <h2 className="text-xl font-semibold mb-4">Site Settings</h2>
           <p className="mb-4">Configure global site settings and preferences.</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="border rounded-md p-4">
               <h3 className="font-medium mb-2">Authentication Settings</h3>
               <p className="text-sm text-muted-foreground mb-4">
@@ -72,6 +72,20 @@ export default async function AdminPage() {
                   className="bg-blue-600 text-white hover:bg-blue-700"
                 >
                   Configure Roles
+                </Button>
+              </a>
+            </div>
+
+            <div className="border rounded-md p-4">
+              <h3 className="font-medium mb-2">API Tester</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Test API endpoints including the click tracking API.
+              </p>
+              <a href="/admin/api-tester">
+                <Button
+                  className="bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  Open API Tester
                 </Button>
               </a>
             </div>

@@ -256,13 +256,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session
     },
     // Handle account linking and sign-in
-    async signIn({ user, account, profile, email }) {
+    async signIn({ user, account }) {
       // Log the sign-in attempt
       console.log("[auth][signIn] Sign-in attempt for:", user?.email, "with provider:", account?.provider);
 
       try {
         // If the user is signing in with an OAuth provider and we have their email
-        if (account?.provider !== "credentials" && user?.email) {
+        if (account?.provider !== "credentials" && user?.email && prisma) {
           // Check if a user with this email already exists
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email },
@@ -282,8 +282,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
               // Manually create the account link
               try {
-                // Make sure account is defined
-                if (account) {
+                // Make sure account is defined and prisma is available
+                if (account && prisma) {
                   await prisma.account.create({
                     data: {
                       userId: existingUser.id,
@@ -402,6 +402,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       try {
         // Check if the user exists in the database
+        if (!prisma) {
+          console.log("[auth][linkAccount] Prisma client is not available");
+          return;
+        }
+
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
           include: { accounts: true }
@@ -416,7 +421,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           // Check if there are other users with the same email but different IDs
-          if (user.email) {
+          if (user.email && prisma) {
             const otherUsersWithSameEmail = await prisma.user.findMany({
               where: {
                 email: user.email,
@@ -453,7 +458,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         console.log("[auth][event:signIn] This is a new user");
 
         // For development, automatically set the first user as admin
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === "development" && prisma) {
           try {
             // Check if this is the first user
             const userCount = await prisma.user.count();
